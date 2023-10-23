@@ -37,6 +37,7 @@ jobs:
   sign-in-with-esignet:
     #if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
     runs-on: ubuntu-latest
+    needs: build-sign-in-with-esignet
     env:
       SERVICE_LOCATION: ./sign-in-with-esignet
       DIST_BUILD_ARTIFACT: dist
