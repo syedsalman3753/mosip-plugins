@@ -26,7 +26,7 @@ on:
 
 jobs:
   build-sign-in-with-esignet:
-    if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
+    #if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
     uses: mosip/kattu/.github/workflows/npm-build.yml@master
     with:
       SERVICE_LOCATION: ./sign-in-with-esignet
@@ -35,7 +35,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
   sign-in-with-esignet:
-    if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
+    #if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
     runs-on: ubuntu-latest
     env:
       SERVICE_LOCATION: ./sign-in-with-esignet
