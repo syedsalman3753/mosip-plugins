@@ -103,7 +103,6 @@ jobs:
     uses: syedsalman3753/kattu/.github/workflows/npm-publish-to-npm-registry.yml@master
     with:
       SERVICE_LOCATION: ./secure-biometric-interface-integrator
-      BUILD_ARTIFACT: sbi-integrator
     secrets:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
