@@ -44,7 +44,7 @@ jobs:
       BUILD_ARTIFACT: sign-in-with-esignet
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - uses: actions/download-artifact@v3
         with:
@@ -88,33 +88,25 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
         if: failure() # Pick up events even if the job fails or is canceled.
 
+  build-secure-biometric-interface-integrator:
+    #if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
+    uses: mosip/kattu/.github/workflows/npm-build.yml@master
+    with:
+      SERVICE_LOCATION: ./secure-biometric-interface-integrator
+      BUILD_ARTIFACT: dist-sbi-integrator
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
   secure-biometric-interface-integrator:
-    if: "contains(github.event.inputs.source_directory, 'secure-biometric-interface-integrator')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: npm Install
-        run: |
-          cd secure-biometric-interface-integrator
-          npm i
-      - name: Build APK
-        run: |
-          cd secure-biometric-interface-integrator
-          npm run build
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          package_path: './secure-biometric-interface-integrator'
-          registry-url: 'https://registry.npmjs.org/'
-      - name: Publish package
-        run: cd secure-biometric-interface-integrator && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      
+    needs: build-secure-biometric-interface-integrator
+    #if: "contains(github.event.inputs.source_directory, 'secure-biometric-interface-integrator')"
+    uses: mosip/kattu/.github/workflows/npm-publish-to-npm-registry.yml@master
+    with:
+      SERVICE_LOCATION: ./secure-biometric-interface-integrator
+      BUILD_ARTIFACT: sbi-integrator
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   storybook-example:
     if: "contains(github.event.inputs.source_directory, 'storybook-example')"
