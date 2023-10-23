@@ -17,27 +17,38 @@ on:
       - develop
       - master
       - 0.*
+      - MOSIP
+      - release*
   pull_request:
     types: [ opened, synchronize, reopened ]
+  release:
+    types: [published]
+
 jobs:
+  build-sign-in-with-esignet:
+    if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
+    uses: mosip/kattu/.github/workflows/npm-build.yml@master
+    with:
+      SERVICE_LOCATION: ./sign-in-with-esignet
+      DIST_BUILD_ARTIFACT: dist
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
   sign-in-with-esignet:
     if: "contains(github.event.inputs.source_directory, 'sign-in-with-esignet')"
     runs-on: ubuntu-latest
+    env:
+      SERVICE_LOCATION: ./sign-in-with-esignet
+      DIST_BUILD_ARTIFACT: dist
+      BUILD_ARTIFACT: sign-in-with-esignet
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: npm Install
-        run: |
-          cd sign-in-with-esignet
-          npm i
-      - name: Build APK
-        run: |
-          cd sign-in-with-esignet
-          npm run build
       - name: Zip dist directory
         run: |
-          cd sign-in-with-esignet
+          cd ${{ env.SERVICE_LOCATION }}
+          unzip ${{ env.DIST_BUILD_ARTIFACT }}
           mv dist sign-in-with-esignet
           zip -r sign-in-with-esignet.zip sign-in-with-esignet/
 
@@ -58,10 +69,18 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.ACTION_PAT }}
         with:
           source_folder: mosip-plugins
-          destination_repo: mosip/artifactory-ref-impl
+          destination_repo: syedsalman3753/artifactory-ref-impl
           destination_folder: artifacts/src/mosip-plugins/sign-in-with-esignet/
           destination_branch: ${{ github.event.inputs.destination_branch }}
           user_name: mosip
+
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,author,commit,workflow,job # selectable (default: repo,message)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+        if: failure() # Pick up events even if the job fails or is canceled.
 
   secure-biometric-interface-integrator:
     if: "contains(github.event.inputs.source_directory, 'secure-biometric-interface-integrator')"
