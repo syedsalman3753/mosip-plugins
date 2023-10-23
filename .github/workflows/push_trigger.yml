@@ -46,6 +46,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.DIST_BUILD_ARTIFACT }}
+          path: ${{ env.SERVICE_LOCATION }}
+
       - name: Zip dist directory
         run: |
           cd ${{ env.SERVICE_LOCATION }}
